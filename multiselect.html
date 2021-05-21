@@ -1,0 +1,199 @@
+<html>
+    <head>
+        <title>Multiselect</title>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script src="jquery-multiselect/dist/js/bootstrap-multiselect.js"></script>
+        <link href="jquery-multiselect/dist/css/bootstrap-multiselect.css" rel="stylesheet">
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.js"></script> -->
+        <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.css" rel="stylesheet"/> -->
+
+        <style>
+            button {
+                border: none;
+                border-radius: 7px;
+                vertical-align: middle;
+                background:rgba(239, 71, 0, 0.2);
+                margin: 5px;
+            }
+
+            label {
+                margin: 0px;
+                vertical-align: middle;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="form-group col-sm-4">
+                <select name="productOpt[]" multiple="multiple" id="productOpt" >
+                    <option value="C++">C++</option>
+                    <option value="Python">Python</option>
+                    <option value="Java">Java</option>
+                </select>
+            </div>
+
+            <div class="form-group col-sm-4" id="productSelected">
+            </div>
+
+            <div class="form-group col-sm-4">
+                <select name="pengecerOpt[]" multiple="multiple" id="pengecerOpt">
+                    <option value="Isnanda">Isnanda</option>
+                    <option value="Muhammad">Muhammad</option>
+                    <option value="Zain">Zain</option>
+                </select>
+            </div>
+
+            <div class="form-group col-sm-4" id="pengecerSelected">
+            </div>
+        </div>
+    </body>
+
+    <script>
+        // override
+        Element.prototype.remove = function() {
+            this.parentElement.removeChild(this);
+        }
+
+        NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+            for (var i = this.length - 1; i >= 0; i--) {
+                if(this[i] && this[i].parentElement) {
+                    this[i].parentElement.removeChild(this[i]);
+                }
+            }
+        }
+
+        var products = [];
+        var pengecers = [];
+        $("#productOpt").multiselect({
+            nonSelectedText: 'Pilih Produk',
+            onChange: function(element, checked) {
+                for (var option of document.getElementById('productOpt').options) {
+                    if (option.selected) {
+                        if (!products.includes(option.value)) {
+                            products.push(option.value);
+
+                            // create element
+                            var id = option.value;
+                            var btn = document.createElement("button");
+                            btn.id = "btnProduct-" + option.value;
+                            btn.name = "btnProduct-" + option.value;
+                            btn.classList.add("btnSelectedOption");
+                            btn.addEventListener('click', function() {
+                                unCheckSelectedProduct(id);
+                            });
+
+                            var span_value = document.createElement("span");
+                            span_value.innerHTML = option.value + " ";
+
+                            var span_close = document.createElement("span");
+                            span_close.innerHTML = "&#10539;";
+
+                            btn.appendChild(span_value);
+                            btn.appendChild(span_close);
+
+                            var divProductSelected = document.getElementById('productSelected');
+                            divProductSelected.appendChild(btn);
+                        }
+                    } else {
+                        if (products.includes(option.value)) {
+                            for (var index=0; index<products.length; index++) {
+                                if (products[index] == option.value) {
+                                    products.splice(index, 1);
+                                    
+                                    var btnOption = document.getElementById(option.value);
+                                    if (btnOption) {
+                                        btnOption.remove();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        $("#pengecerOpt").multiselect({
+            nonSelectedText: 'Pilih Pengecer',
+            onChange: function(element, checked) {
+                for (var option of document.getElementById('pengecerOpt').options) {
+                    if (option.selected) {
+                        if (!pengecers.includes(option.value)) {
+                            pengecers.push(option.value);
+
+                            // create element
+                            var id = option.value;
+                            var btn = document.createElement("button");
+                            btn.id = "btnPengecer-" + option.value;
+                            btn.name = "btnPengecer-" + option.value;
+                            btn.classList.add("btnSelectedOption");
+                            btn.addEventListener('click', function() {
+                                unCheckSelectedPengecer(id);
+                            });
+
+                            var span_value = document.createElement("span");
+                            span_value.innerHTML = option.value + " ";
+
+                            var span_close = document.createElement("span");
+                            span_close.innerHTML = "&#10539;";
+
+                            btn.appendChild(span_value);
+                            btn.appendChild(span_close);
+
+                            var divPengecerSelected = document.getElementById('pengecerSelected');
+                            divPengecerSelected.appendChild(btn);
+                        } 
+                    } else {
+                        if (pengecers.includes(option.value)) {
+                            for (var index=0; index<pengecers.length; index++) {
+                                if (pengecers[index] == option.value) {
+                                    pengecers.splice(index, 1);
+                                    
+                                    var btnOption = document.getElementById(option.value);
+                                    if (btnOption) {
+                                        btnOption.remove();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function unCheckSelectedProduct(name) {
+            var btnId = "btnProduct-" + name;
+            $("#productOpt option[value='"+name+"']").prop('selected', false);
+            document.getElementById(btnId).remove();
+
+            // delete name from array
+            for (index=0; index<products.length; index++) {
+                if (products[index] == name) {
+                    products.splice(index, 1);
+                }
+            }
+
+            $("#productOpt").multiselect('refresh');
+
+        }
+
+        function unCheckSelectedPengecer(name) {
+            var btnId = "btnPengecer-" + name;
+            $("#pengecerOpt option[value='"+name+"']").prop('selected', false);
+            document.getElementById(btnId).remove();
+
+            // delete name from array
+            for (index=0; index<pengecers.length; index++) {
+                if (pengecers[index] == name) {
+                    pengecers.splice(index, 1);
+                }
+            }
+            $("#pengecerOpt").multiselect('refresh');
+        }
+
+    </script>
+</html>
